@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 public class TriviaBot {
 
@@ -75,8 +77,8 @@ public class TriviaBot {
         }
 
         // turn the JSON response into Java objects
-        Gson gson = new Gson();
-        TriviaResponse data = gson.fromJson(response.body(), TriviaResponse.class);
+        JSONObject json = new JSONObject(response.body());
+        TriviaResponse data = json.fromJson(response.body(), TriviaResponse.class);
 
         if (data.response_code != 0) {
             System.out.println("Trivia Bot couldn't find questions for that selection.");
