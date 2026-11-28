@@ -10,12 +10,15 @@ import org.json.JSONArray;
 
 public class TriviaBot {
 
-    public static void getPokemonGeneration(int generation)
+    public static void searchLifeSeries(String searchTerm)
             throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
 
-        String url = "https://pokeapi.co/api/v2/generation/" + generation;
+        String search = searchTerm.replace(" ", "%20");
+
+        String url = "https://the-life-series.fandom.com/api.php?action=query&list=search&srsearch="
+                + search + "&format=json";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -28,21 +31,26 @@ public class TriviaBot {
 
             JSONObject data = new JSONObject(response.body());
 
-            String name = data.getString("name");
-            JSONArray pokemon = data.getJSONArray("pokemon_species");
+            JSONObject query = data.getJSONObject("query");
+            JSONArray results = query.getJSONArray("search");
 
-            System.out.println("Generation: " + name);
-            System.out.println("Number of Pokemon: " + pokemon.length());
+            System.out.println();
+            System.out.println("Here is what I found:");
 
-            System.out.println("Some Pokemon from this generation:");
+            if (results.length() == 0) {
+                System.out.println("No results found. Try another topic.");
+            } else {
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject page = results.getJSONObject(i);
 
-            for (int i = 0; i < 5 && i < pokemon.length(); i++) {
-                JSONObject pokemonData = pokemon.getJSONObject(i);
-                System.out.println(pokemonData.getString("name"));
+                    String title = page.getString("title");
+
+                    System.out.println((i + 1) + ". " + title);
+                }
             }
 
         } else {
-            System.out.println("Could not retrieve Pokemon information.");
+            System.out.println("The bot couldn't connect to the wiki.");
         }
     }
 
@@ -51,12 +59,12 @@ public class TriviaBot {
 
         Scanner in = new Scanner(System.in);
 
-        System.out.println("Welcome to Pokemon Trivia Bot!");
-        System.out.print("Choose a generation (1-9): ");
+        System.out.println("Welcome to the Life Series Trivia Bot!");
+        System.out.print("What topic should I search for? ");
 
-        int generation = in.nextInt();
+        String topic = in.nextLine();
 
-        getPokemonGeneration(generation);
+        searchLifeSeries(topic);
 
         in.close();
     }
